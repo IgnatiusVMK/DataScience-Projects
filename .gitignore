@@ -1,4 +1,4 @@
 pycaret
 .venv
 .vscode
-.gitignore
+.idea

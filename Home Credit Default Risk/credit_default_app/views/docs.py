@@ -3,6 +3,7 @@ import streamlit as st
 
 def render_datasets():
     st.title("Home Credit Default Risk")
+    st.divider()
     st.write("Can you predict how capable each applicant is of repaying a loan?")
     st.write("""
     ### Dataset Description

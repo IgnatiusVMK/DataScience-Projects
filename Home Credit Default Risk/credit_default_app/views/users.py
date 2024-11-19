@@ -6,10 +6,20 @@ import mysql.connector
 from mysql.connector import Error
 
 def render_active_users():
+    
     # Import the connection variables
     from db_config import db_config
 
     config = db_config
+    
+    config2 = {
+        'user': 'credadminvmk',
+        'password': 'Vcred@Pass4321',
+        'host':'localhost',
+        'port': 3306,
+        'database': 'cred_default_app',
+        'raise_on_warnings': True
+    }
 
     st.title("Active")
 
@@ -21,31 +31,26 @@ def render_active_users():
         except Error as e:
             st.error(f"Database connection failed: {e}")
             return None
-
-    def fetch_all_users():
-        conn = create_connection()
-        cursor = conn.cursor()
-
+    def create_connection2():
         try:
-            users_query = " SELECT * FROM users"
-            cursor.execute(users_query)
-            rows = cursor.fetchall()
-            columns = [col[0] for col in  cursor.description]
-        except Error as f:
-            st.error(f"Error: {f}")
+            connection = mysql.connector.connect(**config2)
+            st.success("Connected to the database.")
+            return connection
+        except Error as e:
+            st.error(f"Database connection failed: {e}")
             return None
 
-        all_users = pd.DataFrame(rows, columns=columns)
+    # @st.cache_data
+    def fetch_all_users():
+        conn = create_connection()
+        users_query = " SELECT * FROM users"
+        return pd.read_sql_query(users_query, conn)
 
-        cursor.close()
-        conn.close()
-
-        return all_users
-
-    users =  fetch_all_users()
+    fetch_users = fetch_all_users()
 
     # Display the DataFrame in Streamlit
-    if users is not None:
-        st.write(users)
+    if fetch_users is not None:
+        st.write(fetch_users)
     else:
         st.write("No users found or an error occurred.")
+    

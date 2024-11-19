@@ -1,0 +1,10 @@
+streamlit
+pandas
+numpy
+matplotlib
+mysql-connector-python
+pandas-profiling
+streamlit-pandas-profiling
+pydantic
+pydantic-settings
+python-dotenv

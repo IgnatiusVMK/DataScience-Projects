@@ -1,61 +1,155 @@
+# import pandas as pd
+# import numpy as np
+# import streamlit as st
+# import os
+# from pycaret.classification import load_model as pycaret_load_model
+
+# def render_model():
+#     st.title("Credit Default Prediction Model")
+#     st.write(
+#         """
+#         This application uses a trained model to predict the likelihood of loan default based on applicant data.
+#         The model was saved using the `save_model()` function in PyCaret:
+#         ```python
+#         save_model(best_model, 'credit_default_pipeline')
+#         ```
+#         """
+#     )
+#     st.image(
+#         os.path.join(os.getcwd(), 'static', 'best_model.png'), caption="Model Pipeline"
+#     )
+
+#     # Load the saved PyCaret model
+#     @st.cache_resource
+#     def load_saved_model():
+#         model_path = os.path.join(
+#             '/home', 'ignatiusvmk', 'PycharmProjects', 'DataScience Projects', 
+#             'Home Credit Default Risk', 'UnderSample', 'credit_default_pipeline'
+#         )
+#         return pycaret_load_model(model_path)
+
+#     model = load_saved_model()
+
+#     # Retrieve the model's expected feature columns
+#     expected_columns = model.feature_names_in_
+
+#     # Debugging: Display expected features
+#     st.write("Model expected columns:", expected_columns)
+
+#     # Input fields for user-provided data (Top 10 important features)
+#     user_inputs = {
+#         "CREDIT_DURATION_MEAN": st.number_input("CREDIT_DURATION_MEAN", min_value=0.0, step=0.01),
+#         "CREDIT_SUM_TOTAL": st.number_input("CREDIT_SUM_TOTAL", min_value=0.0, step=0.01),
+#         "AMT_CREDIT": st.number_input("AMT_CREDIT", min_value=0.0, step=0.01),
+#         "AMT_GOODS_PRICE": st.number_input("AMT_GOODS_PRICE", min_value=0.0, step=0.01),
+#         "DAYS_BIRTH": st.number_input("DAYS_BIRTH", min_value=-100000, step=1),
+#         "DAYS_LAST_PHONE_CHANGE": st.number_input("DAYS_LAST_PHONE_CHANGE", min_value=-100000, step=1),
+#         "AMT_ANNUITY": st.number_input("AMT_ANNUITY", min_value=0.0, step=0.01),
+#         "DAYS_EMPLOYED": st.number_input("DAYS_EMPLOYED", min_value=-100000, step=1),
+#         "DAYS_ID_PUBLISH": st.number_input("DAYS_ID_PUBLISH", min_value=-100000, step=1),
+#         "PAYMENT_TOTAL": st.number_input("PAYMENT_TOTAL", min_value=0.0, step=0.01),
+#     }
+
+#     # Prepare input DataFrame
+#     input_data_df = pd.DataFrame([user_inputs])
+
+#     # Ensure all expected columns are present and in correct order
+#     for col in expected_columns:
+#         if col not in input_data_df.columns:
+#             input_data_df[col] = 0  # Add missing columns with default value of 0
+
+#     # Reorder DataFrame to match expected column order
+#     input_data_df = input_data_df[expected_columns]
+
+#     # Validate and display the input data
+#     st.write("Input data for prediction:")
+#     st.write(input_data_df)
+
+#     # Make prediction on button click
+#     if st.button("Submit"):
+#         try:
+#             prediction = model.predict(input_data_df)
+#             prediction_label = "High risk of default" if prediction[0] == 1 else "Low risk of default"
+#             st.success(f"Prediction: {prediction_label}")
+#         except Exception as e:
+#             st.error(f"Prediction failed: {e}")
+
+# # Run the application
+# if __name__ == "__main__":
+#     render_model()
+
 import pandas as pd
 import numpy as np
 import streamlit as st
 import os
-
-import pandas_profiling
-from streamlit_pandas_profiling import st_profile_report
-
-train_data = pd.read_csv('/home/ignatiusvmk/Downloads/home-credit-default-risk/application_train.csv')
+from pycaret.classification import load_model as pycaret_load_model
 
 def render_model():
-    st.title("Model Pipeline")
-    st.write("""
-            * Aiming to use the model saved via the save_model() function\n
-            > `save_model(best_model, 'credit_default_pipeline')`
-            """)
-    st.image(os.path.join(os.getcwd(), 'static', 'best_model.png'), caption="Model Pipeline")
+    st.title("Credit Default Prediction Model")
+    st.write(
+        """
+        This application uses a trained model to predict the likelihood of loan default based on applicant data.
+        The model was saved using the `save_model()` function in PyCaret:
+        ```python
+        save_model(best_model, 'credit_default_pipeline')
+        ```
+        """
+    )
+    st.image(
+        os.path.join(os.getcwd(), 'static', 'best_model.png'), caption="Model Pipeline"
+    )
+
+    # Load the saved PyCaret model
+    @st.cache_resource
+    def load_saved_model():
+        model_path = os.path.join(
+            '/home', 'ignatiusvmk', 'PycharmProjects', 'DataScience Projects', 
+            'Home Credit Default Risk', 'UnderSample', 'credit_default_pipeline'
+        )
+        return pycaret_load_model(model_path)
+
+    model = load_saved_model()
+
+    # Retrieve the model's expected feature columns
+    expected_columns = model.feature_names_in_
+
+    # Debugging: Display expected features
+    st.write("Model expected columns:", expected_columns)
+
+    # Input fields for user-provided data (use all expected features)
+    user_inputs = {}
     
-    # Load the data
-    df = pd.read_csv('/home/ignatiusvmk/Downloads/home-credit-default-risk/application_train.csv')
+    for col in expected_columns:
+        if col in ["CREDIT_DURATION_MEAN", "CREDIT_SUM_TOTAL", "AMT_CREDIT", 
+                    "AMT_GOODS_PRICE", "DAYS_BIRTH", "DAYS_LAST_PHONE_CHANGE", 
+                    "AMT_ANNUITY", "DAYS_EMPLOYED", "DAYS_ID_PUBLISH", 
+                    "PAYMENT_TOTAL"]:
+            user_inputs[col] = st.number_input(col, min_value=0.0, step=0.01)
 
-    # Clean data: Replace NaNs and infinities
-    if df.isnull().sum().any() or np.isinf(df).sum().any():
-        st.warning("Data contains NaN or infinite values. Cleaning data...")
-        df.fillna(0, inplace=True)  # Fill NaN values
-        df.replace([np.inf, -np.inf], 0, inplace=True)  # Replace infinite values
+    # Prepare input DataFrame
+    input_data_df = pd.DataFrame([user_inputs])
 
-    # Convert Int64 (nullable integer) columns to int
-    for col in df.columns:
-        if pd.api.types.is_integer_dtype(df[col]):
-            df[col] = df[col].astype('int64')
+    # Ensure all expected columns are present and in correct order
+    for col in expected_columns:
+        if col not in input_data_df.columns:
+            input_data_df[col] = 0  # Add missing columns with default value of 0
 
-    # Convert non-numeric object columns to category
-    for col in df.select_dtypes(include=['object']).columns:
-        df[col] = df[col].astype('category')
+    # Reorder DataFrame to match expected column order
+    input_data_df = input_data_df[expected_columns]
 
-    # Display data types for verification
-    st.write("Data types after conversion:")
-    st.write(df.dtypes)
+    # Validate and display the input data
+    st.write("Input data for prediction:")
+    st.write(input_data_df)
 
-    # Debug: Identify columns causing issues
-    problematic_cols = []
-    for col in df.columns:
+    # Make prediction on button click
+    if st.button("Submit"):
         try:
-            # Check if the column can be summarized in profiling
-            _ = df[col].describe()
+            prediction = model.predict(input_data_df)
+            prediction_label = "High risk of default" if prediction[0] == 1 else "Low risk of default"
+            st.success(f"Prediction: {prediction_label}")
         except Exception as e:
-            st.write(f"Column '{col}' caused an issue: {e}")
-            problematic_cols.append(col)
+            st.error(f"Prediction failed: {e}")
 
-    # Drop problematic columns (if any)
-    if problematic_cols:
-        st.write(f"Dropping problematic columns: {problematic_cols}")
-        df.drop(columns=problematic_cols, inplace=True)
-
-    # Generate profile report
-    try:
-        pr = df.profile_report()
-        st_profile_report(pr)
-    except Exception as e:
-        st.error(f"An error occurred while generating the profile report: {e}")
+# Run the application
+if __name__ == "__main__":
+    render_model()

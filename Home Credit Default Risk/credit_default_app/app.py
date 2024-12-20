@@ -8,9 +8,10 @@ from views.users import render_active_users
 from views.model import render_model
 
 # Import the connection variables
-from db_config import db_config
+from db_config import db_config, config2
 
 config = db_config
+db_config2 = config2
 
 # Define connection parameters
 

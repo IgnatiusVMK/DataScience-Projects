@@ -8,7 +8,7 @@ from mysql.connector import Error
 def render_active_users():
     
     # Import the connection variables
-    from db_config import db_config; config2
+    from db_config import db_config, config2
 
     config = db_config
     config2 = config2

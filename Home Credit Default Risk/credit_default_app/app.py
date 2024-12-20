@@ -13,17 +13,6 @@ from db_config import db_config, config2
 config = db_config
 db_config2 = config2
 
-# Define connection parameters
-
-db_config2= {
-    'user': 'credadminvmk',
-    'password': 'Vcred@Pass4321',
-    'host':'localhost',
-    'port': 3306,
-    'database': 'cred_default_app',
-    'raise_on_warnings': True
-}
-
 # Ensure session state is initialized
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False

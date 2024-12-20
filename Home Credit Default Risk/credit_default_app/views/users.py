@@ -8,18 +8,10 @@ from mysql.connector import Error
 def render_active_users():
     
     # Import the connection variables
-    from db_config import db_config
+    from db_config import db_config; config2
 
     config = db_config
-    
-    config2 = {
-        'user': 'credadminvmk',
-        'password': 'Vcred@Pass4321',
-        'host':'localhost',
-        'port': 3306,
-        'database': 'cred_default_app',
-        'raise_on_warnings': True
-    }
+    config2 = config2
 
     st.title("Active")
 
